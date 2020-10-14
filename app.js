@@ -15,7 +15,7 @@ const questions = [{
         message: "What type of employee is this?",
         name: "type",
         type: "list",
-        choices: ["Generic", "Engineer", "Intern", "Manager"]
+        choices: ["Engineer", "Intern", "Manager"]
     },
     {
         message: "What is the employee's name?",
@@ -61,12 +61,10 @@ async function init() {
         let data = await inquirer.prompt(questions);
         let {specific} = data.type === "Engineer" ? await inquirer.prompt(engineerQ)
             : data.type === "Intern" ? await inquirer.prompt(internQ)
-            : data.type === "Manager" ? await inquirer.prompt(managerQ)
-            : "";
+            : await inquirer.prompt(managerQ);
         if (data.type === "Engineer") employees.push(new Engineer(data.name, data.id, data.email, specific));
         else if (data.type === "Intern") employees.push(new Intern(data.name, data.id, data.email, specific));
         else if (data.type === "Manager") employees.push(new Manager(data.name, data.id, data.email, specific));
-        else employees.push(new Employee(data.name, data.id, data.email));
         let extra = await inquirer.prompt(another);
         if (!extra.more) more = false;
     }
