@@ -9,7 +9,72 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
+const Employee = require("./lib/Employee");
 
+const questions = [{
+        message: "What type of employee is this?",
+        name: "type",
+        type: "list",
+        choices: ["Generic", "Engineer", "Intern", "Manager"]
+    },
+    {
+        message: "What is the employee's name?",
+        name: "name",
+        type: "text",
+    },
+    {
+        message: "What is the employee's id number?",
+        name: "id",
+        type: "text",
+    },
+    {
+        message: "What is the employee's email?",
+        name: "email",
+        type: "text",
+    },
+]
+const another = {
+    message: "Do you wish to add another employee?",
+    name: "more",
+    type: "confirm",
+}
+const engineerQ = {
+    message: "What is the employee's GitHub username?",
+    name: "specific",
+    type: "text",
+}
+const internQ = {
+    message: "What is the employee's school?",
+    name: "specific",
+    type: "text",
+}
+const managerQ = {
+    message: "What is the employee's office number?",
+    name: "specific",
+    type: "text",
+}
+
+async function init() {
+    const employees = [];
+    let more = true;
+    while (more) {
+        let data = await inquirer.prompt(questions);
+        let {specific} = data.type === "Engineer" ? await inquirer.prompt(engineerQ)
+            : data.type === "Intern" ? await inquirer.prompt(internQ)
+            : data.type === "Manager" ? await inquirer.prompt(managerQ)
+            : "";
+        if (data.type === "Engineer") employees.push(new Engineer(data.name, data.id, data.email, specific));
+        else if (data.type === "Intern") employees.push(new Intern(data.name, data.id, data.email, specific));
+        else if (data.type === "Manager") employees.push(new Manager(data.name, data.id, data.email, specific));
+        else employees.push(new Employee(data.name, data.id, data.email));
+        let extra = await inquirer.prompt(another);
+        if (!extra.more) more = false;
+    }
+    let html = render(employees);
+    fs.writeFile(outputPath, html, () => console.log("Wrote to file."));
+
+}
+init();
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
